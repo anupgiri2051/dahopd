@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dhaulagiri Ayurveda Hospital - EMR & Billing | Gandaki Province</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @media print {
+            body * { visibility: hidden; }
+            #print-section, #print-section * { visibility: visible; }
+            #print-section { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- TOP PROVINCIAL GOVERNMENT HEADER -->
+    <header class="bg-red-800 text-white px-6 py-2 flex flex-col sm:flex-row justify-between items-center text-xs border-b-2 border-amber-400 no-print">
+        <div class="flex items-center space-x-2">
+            <span class="font-bold">गण्डकी प्रदेश सरकार | Gandaki Province Government</span>
+            <span>•</span>
+            <span>स्वास्थ्य मन्त्रालय | Ministry of Health</span>
+        </div>
+        <div class="mt-1 sm:mt-0 flex items-center space-x-3">
+            <span><i class="fa-solid fa-location-dot text-amber-300"></i> बागलुङ, नेपाल (Baglung, Nepal)</span>
+            <span>|</span>
+            <span id="current-time"></span>
+        </div>
+    </header>
+
+    <!-- MAIN BRANDING BAR -->
+    <div class="bg-white px-6 py-4 border-b border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center no-print">
+        <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 bg-emerald-800 text-white rounded-lg flex items-center justify-center text-2xl font-bold shadow">
+                <i class="fa-solid fa-leaf text-amber-300"></i>
+            </div>
+            <div>
+                <h1 class="font-extrabold text-xl text-emerald-950 leading-tight">धौलागिरी आयुर्वेद अस्पताल</h1>
+                <h2 class="text-xs font-bold text-slate-600">DHAULAGIRI AYURVEDA HOSPITAL - EMR & BILLING SYSTEM</h2>
+            </div>
+        </div>
+
+        <div class="mt-3 md:mt-0 flex items-center space-x-4">
+            <div class="text-right">
+                <p class="text-xs text-slate-500 font-semibold">Active Counter / Desk</p>
+                <p class="text-sm font-bold text-emerald-900"><i class="fa-solid fa-user-doctor text-emerald-600 me-1"></i> Main OPD & Billing Counter</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP WRAPPER -->
+    <div class="flex-1 flex flex-col md:flex-row no-print">
+
+        <!-- SIDEBAR NAVIGATION -->
+        <aside class="w-full md:w-64 bg-emerald-900 text-white flex-shrink-0">
+            <nav class="p-4 space-y-2 text-sm font-medium">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full text-left flex items-center space-x-3 bg-emerald-800 text-white px-4 py-3 rounded-lg transition">
+                    <i class="fa-solid fa-chart-line w-5"></i>
+                    <span>Dashboard / मुख्य पृष्ठ</span>
+                </button>
+                <button onclick="switchTab('consultation')" id="nav-consultation" class="w-full text-left flex items-center space-x-3 text-emerald-200 hover:bg-emerald-800 hover:text-white px-4 py-3 rounded-lg transition">
+                    <i class="fa-solid fa-stethoscope w-5"></i>
+                    <span>OPD Consultation / जाँच</span>
+                </button>
+                <button onclick="switchTab('billing')" id="nav-billing" class="w-full text-left flex items-center space-x-3 text-emerald-200 hover:bg-emerald-800 hover:text-white px-4 py-3 rounded-lg transition">
+                    <i class="fa-solid fa-file-invoice-dollar w-5"></i>
+                    <span>Billing & Receipt / बिलिङ</span>
+                </button>
+                <button onclick="switchTab('records')" id="nav-records" class="w-full text-left flex items-center space-x-3 text-emerald-200 hover:bg-emerald-800 hover:text-white px-4 py-3 rounded-lg transition">
+                    <i class="fa-solid fa-folder-open w-5"></i>
+                    <span>Patient History / रेकर्ड</span>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- MAIN DYNAMIC CONTENT -->
+        <main class="flex-1 p-6 overflow-y-auto">
+
+            <!-- TAB 1: DASHBOARD -->
+            <section id="tab-dashboard" class="space-y-6">
+                <!-- STATS CARDS -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-slate-500 uppercase font-bold">Total Patients</p>
+                            <h3 id="stat-total" class="text-2xl font-extrabold text-slate-800 mt-1">0</h3>
+                        </div>
+                        <div class="p-3 bg-emerald-100 text-emerald-800 rounded-lg"><i class="fa-solid fa-users text-xl"></i></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-slate-500 uppercase font-bold">Waiting Queue</p>
+                            <h3 id="stat-waiting" class="text-2xl font-extrabold text-amber-600 mt-1">0</h3>
+                        </div>
+                        <div class="p-3 bg-amber-100 text-amber-800 rounded-lg"><i class="fa-solid fa-clock text-xl"></i></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-slate-500 uppercase font-bold">Completed Today</p>
+                            <h3 id="stat-completed" class="text-2xl font-extrabold text-emerald-600 mt-1">0</h3>
+                        </div>
+                        <div class="p-3 bg-emerald-100 text-emerald-800 rounded-lg"><i class="fa-solid fa-circle-check text-xl"></i></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-slate-500 uppercase font-bold">Total Revenue (NPR)</p>
+                            <h3 id="stat-revenue" class="text-2xl font-extrabold text-blue-600 mt-1">रु 0</h3>
+                        </div>
+                        <div class="p-3 bg-blue-100 text-blue-800 rounded-lg"><i class="fa-solid fa-money-bill-wave text-xl"></i></div>
+                    </div>
+                </div>
+
+                <!-- REGISTRATION & QUEUE GRID -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- REGISTRATION FORM -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                        <h3 class="font-bold text-lg text-emerald-950 border-b pb-3 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-user-plus text-emerald-600"></i> New Ticket Entry (नयाँ दर्ता)
+                        </h3>
+                        <form id="form-register" onsubmit="registerPatient(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Full Name (पूरा नाम) *</label>
+                                <input type="text" id="reg-name" required placeholder="e.g. Ram Bahadur Thapa" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Age (उमेर) *</label>
+                                    <input type="number" id="reg-age" required placeholder="45" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Gender (लिङ्ग) *</label>
+                                    <select id="reg-gender" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                        <option value="Male">Male (पुरुष)</option>
+                                        <option value="Female">Female (महिला)</option>
+                                        <option value="Other">Other (अन्य)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Phone Number (फोन नम्बर) *</label>
+                                <input type="tel" id="reg-phone" required placeholder="98XXXXXXXX" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Address (ठेगाना)</label>
+                                <input type="text" id="reg-address" value="Baglung-01, Nepal" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                            <button type="submit" class="w-full bg-emerald-800 hover:bg-emerald-900 text-white font-bold py-2.5 rounded-lg text-sm transition">
+                                <i class="fa-solid fa-ticket me-1"></i> Register & Issue OPD Ticket
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- LIVE QUEUE TABLE -->
+                    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                        <div class="flex justify-between items-center border-b pb-3 mb-4">
+                            <h3 class="font-bold text-lg text-emerald-950 flex items-center gap-2">
+                                <i class="fa-solid fa-list-check text-emerald-600"></i> Today's OPD Queue
+                            </h3>
+                            <button onclick="renderQueue()" class="text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded font-bold text-slate-600">
+                                <i class="fa-solid fa-rotate me-1"></i> Refresh List
+                            </button>
+                        </div>
+                        <div id="queue-container" class="space-y-3 max-h-[380px] overflow-y-auto">
+                            <!-- Dynamically generated queue -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: CONSULTATION -->
+            <section id="tab-consultation" class="hidden space-y-6">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex justify-between items-center border-b pb-4 mb-4">
+                        <div>
+                            <h3 class="font-bold text-lg text-emerald-950">Ayurvedic OPD Consultation / चिकित्सक जाँच</h3>
+                            <p class="text-xs text-slate-500">Recorded directly into Gandaki Province EMR Central Repository</p>
+                        </div>
+                        <span id="active-patient-badge" class="bg-amber-100 text-amber-900 font-bold text-xs px-3 py-1 rounded-full border border-amber-300">
+                            No Patient Selected
+                        </span>
+                    </div>
+
+                    <form id="form-consultation" onsubmit="saveConsultation(event)" class="space-y-6">
+                        <!-- PATIENT INFO STRIP -->
+                        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500">PATIENT TICKET ID</label>
+                                <input type="text" id="consult-id" readonly class="bg-transparent font-bold text-slate-800 text-sm outline-none" placeholder="Select from Queue">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500">FULL NAME</label>
+                                <input type="text" id="consult-name" readonly class="bg-transparent font-bold text-slate-800 text-sm outline-none" placeholder="Select from Queue">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500">AGE / GENDER</label>
+                                <input type="text" id="consult-agegender" readonly class="bg-transparent font-bold text-slate-800 text-sm outline-none" placeholder="-">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500">PHONE</label>
+                                <input type="text" id="consult-phone" readonly class="bg-transparent font-bold text-slate-800 text-sm outline-none" placeholder="-">
+                            </div>
+                        </div>
+
+                        <!-- ASHTAVIDHA PARIKSHA -->
+                        <div class="p-4 bg-emerald-50/70 rounded-xl border border-emerald-200 space-y-3">
+                            <h4 class="font-bold text-emerald-950 text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-notes-medical text-emerald-700"></i> Ashtavidha Pariksha (अष्टविध परीक्षा)
+                            </h4>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                                <div>
+                                    <label class="block font-bold text-slate-700 mb-1">Nadi (नाडी)</label>
+                                    <select id="exam-nadi" class="w-full border border-slate-300 rounded p-2 bg-white outline-none">
+                                        <option value="Vata (वात)">Vata (वात)</option>
+                                        <option value="Pitta (पित्त)">Pitta (पित्त)</option>
+                                        <option value="Kapha (कफ)">Kapha (कफ)</option>
+                                        <option value="Vata-Pitta">Vata-Pitta</option>
+                                        <option value="Pitta-Kapha">Pitta-Kapha</option>
+                                        <option value="Sannipataj">Sannipataj</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-slate-700 mb-1">Jihwa (जिह्वा)</label>
+                                    <select id="exam-jihwa" class="w-full border border-slate-300 rounded p-2 bg-white outline-none">
+                                        <option value="Nirama (Clear)">Nirama (सामरहित)</option>
+                                        <option value="Sama (Coated)">Sama (सामयुक्त)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-slate-700 mb-1">Mala (मल)</label>
+                                    <select id="exam-mala" class="w-full border border-slate-300 rounded p-2 bg-white outline-none">
+                                        <option value="Normal">Normal (सामान्य)</option>
+                                        <option value="Constipated">Constipated (कब्जियत)</option>
+                                        <option value="Loose Stool">Loose (पखाला)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-slate-700 mb-1">Prakriti (प्रकृति)</label>
+                                    <select id="exam-prakriti" class="w-full border border-slate-300 rounded p-2 bg-white outline-none">
+                                        <option value="Vata-Prakriti">Vata-Prakriti</option>
+                                        <option value="Pitta-Prakriti">Pitta-Prakriti</option>
+                                        <option value="Kapha-Prakriti">Kapha-Prakriti</option>
+                                        <option value="Dwandwaja">Dwandwaja</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DIAGNOSIS & PRESCRIPTION -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Chief Complaints (मुख्य समस्या) *</label>
+                                <textarea id="consult-complaints" required rows="2" placeholder="e.g. Joint pain, stiffness in morning..." class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Ayurvedic Diagnosis / Vyadhi (निदान) *</label>
+                                <textarea id="consult-diagnosis" required rows="2" placeholder="e.g. Amavata (rheumatoid arthritis), Amlapitta..." class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Prescription (Aushadhi / औषधि) *</label>
+                                <textarea id="consult-prescription" required rows="3" placeholder="1. Yograj Guggulu (2 tabs BD after meal)&#10;2. Amrutarishta (20ml with water BD)" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Pathya & Panchakarma Recommendations</label>
+                                <textarea id="consult-pathya" rows="3" placeholder="Avoid cold & sour food. Advised Abhyanga & Swedana 5 days..." class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end space-x-3 pt-2">
+                            <button type="submit" class="px-6 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white font-bold rounded-lg text-sm transition">
+                                <i class="fa-solid fa-print me-1"></i> Save Consultation & Print Doctor Slip
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- TAB 3: BILLING & RECEIPT -->
+            <section id="tab-billing" class="hidden space-y-6">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex justify-between items-center border-b pb-4 mb-4">
+                        <div>
+                            <h3 class="font-bold text-lg text-emerald-950">Hospital Cash Billing & Receipt Counter (बिलिङ काउन्टर)</h3>
+                            <p class="text-xs text-slate-500">Official Government Receipt Generator</p>
+                        </div>
+                        <span id="billing-patient-badge" class="bg-blue-100 text-blue-900 font-bold text-xs px-3 py-1 rounded-full border border-blue-300">
+                            Select Patient Below
+                        </span>
+                    </div>
+
+                    <!-- PATIENT SELECTOR FOR BILLING -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Select Patient to Bill *</label>
+                            <select id="bill-patient-select" onchange="loadPatientForBilling()" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
+                                <option value="">-- Choose Patient --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Receipt Date</label>
+                            <input type="text" id="bill-date" readonly class="w-full border border-slate-200 rounded-lg p-2.5 text-sm bg-slate-100 font-bold">
+                        </div>
+                    </div>
+
+                    <!-- DYNAMIC BILL ITEMIZATION TABLE -->
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-sm text-slate-800">Bill Itemization (शुल्क विवरण)</h4>
+                            <button onclick="addBillRow()" class="px-3 py-1 bg-emerald-700 text-white rounded text-xs font-bold hover:bg-emerald-800">
+                                <i class="fa-solid fa-plus me-1"></i> Add Line Item
+                            </button>
+                        </div>
+
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-100 border-b text-xs font-bold text-slate-700">
+                                    <th class="p-3">Service / Item Description</th>
+                                    <th class="p-3 w-28">Qty</th>
+                                    <th class="p-3 w-36">Rate (NPR)</th>
+                                    <th class="p-3 w-36">Total (NPR)</th>
+                                    <th class="p-3 w-16 text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bill-items-body">
+                                <!-- Dynamic Bill Rows -->
+                            </tbody>
+                        </table>
+
+                        <!-- TOTAL CALCULATION BOX -->
+                        <div class="flex justify-end border-t pt-4">
+                            <div class="w-full sm:w-72 space-y-2 text-right">
+                                <div class="flex justify-between text-sm">
+                                    <span class="font-semibold text-slate-600">Subtotal:</span>
+                                    <span id="bill-subtotal" class="font-bold">रु 0.00</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="font-semibold text-slate-600">Registration/OPD Fee:</span>
+                                    <span id="bill-opd-fee" class="font-bold">रु 50.00</span>
+                                </div>
+                                <div class="flex justify-between text-base border-t pt-2 font-extrabold text-emerald-950">
+                                    <span>Grand Total:</span>
+                                    <span id="bill-grand-total">रु 50.00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end space-x-3 pt-4 border-t">
+                            <button onclick="processAndPrintBill()" class="px-6 py-2.5 bg-blue-800 hover:bg-blue-900 text-white font-bold rounded-lg text-sm transition shadow">
+                                <i class="fa-solid fa-receipt me-1"></i> Save Payment & Print Official Receipt
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: RECORDS LOG -->
+            <section id="tab-records" class="hidden space-y-6">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex flex-col sm:flex-row justify-between items-center border-b pb-4 mb-4 gap-3">
+                        <h3 class="font-bold text-lg text-emerald-950">Hospital Patient Database</h3>
+                        <input type="text" id="search-records" oninput="filterRecords()" placeholder="Search Name, ID, Phone..." class="border border-slate-300 rounded-lg px-3 py-1.5 text-sm w-full sm:w-64 focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-emerald-50 border-b border-emerald-100 text-emerald-950 font-bold text-xs uppercase">
+                                    <th class="p-3">Patient ID</th>
+                                    <th class="p-3">Name</th>
+                                    <th class="p-3">Age/Gender</th>
+                                    <th class="p-3">Phone</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3">Total Billed</th>
+                                    <th class="p-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="records-table-body" class="divide-y divide-slate-100">
+                                <!-- Dynamic Patient History -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- PRINT SECTION CONTAINER (DYNAMICALLY LOADED FOR PRESCRIPTION OR BILL RECEIPT) -->
+    <div id="print-section" class="hidden p-8 bg-white text-slate-900">
+        <!-- Content injected dynamically via JS for Doctor Slip or Billing Receipt -->
+    </div>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        // App State Memory
+        let patients = JSON.parse(localStorage.getItem('dah_patients') || '[]');
+        let selectedPatientId = null;
+        let currentBillRows = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateClock();
+            setInterval(updateClock, 1000);
+            renderQueue();
+            updateStats();
+            document.getElementById('bill-date').value = new Date().toLocaleDateString('ne-NP');
+        });
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('current-time').innerText = now.toLocaleString('ne-NP');
+        }
+
+        // Tab Navigation
+        function switchTab(tabName) {
+            ['dashboard', 'consultation', 'billing', 'records'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`nav-${t}`).classList.remove('bg-emerald-800', 'text-white');
+                document.getElementById(`nav-${t}`).classList.add('text-emerald-200');
+            });
+
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`nav-${tabName}`).classList.add('bg-emerald-800', 'text-white');
+
+            if(tabName === 'billing') populateBillingPatientDropdown();
+            if(tabName === 'records') renderRecords();
+        }
+
+        // Register Patient
+        function registerPatient(e) {
+            e.preventDefault();
+            const id = 'DAH-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
+            const newPatient = {
+                id: id,
+                name: document.getElementById('reg-name').value,
+                age: document.getElementById('reg-age').value,
+                gender: document.getElementById('reg-gender').value,
+                phone: document.getElementById('reg-phone').value,
+                address: document.getElementById('reg-address').value,
+                status: 'Waiting',
+                date: new Date().toLocaleDateString(),
+                consultation: null,
+                bill: {
+                    items: [{ desc: 'OPD Ticket Fee', qty: 1, rate: 50, total: 50 }],
+                    grandTotal: 50,
+                    paid: false
+                }
+            };
+
+            patients.unshift(newPatient);
+            saveData();
+            document.getElementById('form-register').reset();
+            renderQueue();
+            updateStats();
+            alert(`Patient Ticket Registered Successfully! ID: ${id}`);
+        }
+
+        // Render Queue
+        function renderQueue() {
+            const container = document.getElementById('queue-container');
+            container.innerHTML = '';
+
+            if (patients.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 text-center py-8">No active queue. Register a patient above.</p>`;
+                return;
+            }
+
+            patients.forEach(p => {
+                const statusColor = p.status === 'Waiting' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800';
+                const card = document.createElement('div');
+                card.className = "p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between hover:bg-emerald-50 transition";
+                card.innerHTML = `
+                    <div>
+                        <p class="font-bold text-sm text-slate-800">${p.name}</p>
+                        <p class="text-xs text-slate-500">ID: ${p.id} | ${p.age} Yrs, ${p.gender} | ${p.phone}</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs font-bold px-2.5 py-1 rounded-full ${statusColor}">${p.status}</span>
+                        <button onclick="selectForConsultation('${p.id}')" class="px-3 py-1 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold rounded">
+                            Consult
+                        </button>
+                        <button onclick="selectForBillingDirect('${p.id}')" class="px-3 py-1 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold rounded">
+                            Bill
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Select for Consultation
+        function selectForConsultation(id) {
+            const patient = patients.find(p => p.id === id);
+            if (!patient) return;
+
+            selectedPatientId = patient.id;
+            document.getElementById('consult-id').value = patient.id;
+            document.getElementById('consult-name').value = patient.name;
+            document.getElementById('consult-agegender').value = `${patient.age} / ${patient.gender}`;
+            document.getElementById('consult-phone').value = patient.phone;
+
+            document.getElementById('active-patient-badge').innerText = `Active: ${patient.name}`;
+            switchTab('consultation');
+        }
+
+        // Save Doctor Consultation & Print Doctor Slip
+        function saveConsultation(e) {
+            e.preventDefault();
+            if (!selectedPatientId) {
+                alert('Please select a patient from the queue first!');
+                return;
+            }
+
+            const patient = patients.find(p => p.id === selectedPatientId);
+            patient.status = 'Completed';
+            patient.consultation = {
+                nadi: document.getElementById('exam-nadi').value,
+                jihwa: document.getElementById('exam-jihwa').value,
+                mala: document.getElementById('exam-mala').value,
+                prakriti: document.getElementById('exam-prakriti').value,
+                complaints: document.getElementById('consult-complaints').value,
+                diagnosis: document.getElementById('consult-diagnosis').value,
+                prescription: document.getElementById('consult-prescription').value,
+                pathya: document.getElementById('consult-pathya').value
+            };
+
+            saveData();
+            updateStats();
+            renderQueue();
+
+            // Print Prescription Slip
+            printDoctorSlip(patient);
+        }
+
+        function printDoctorSlip(patient) {
+            const printBox = document.getElementById('print-section');
+            printBox.innerHTML = `
+                <div class="text-center border-b-2 border-slate-800 pb-3 mb-4">
+                    <h4 class="text-xs font-bold text-red-700">गण्डकी प्रदेश सरकार | Gandaki Province Government</h4>
+                    <h5 class="text-[10px] font-semibold">स्वास्थ्य मन्त्रालय | Ministry of Health</h5>
+                    <h2 class="text-2xl font-extrabold text-emerald-950">धौलागिरी आयुर्वेद अस्पताल</h2>
+                    <p class="text-xs font-bold">DHAULAGIRI AYURVEDA HOSPITAL</p>
+                    <p class="text-xs">बागलुङ, नेपाल (Baglung, Nepal) | OPD Consultation Slip</p>
+                </div>
+
+                <div class="grid grid-cols-2 text-xs border-b pb-3 mb-4 space-y-1">
+                    <p><strong>Patient ID:</strong> ${patient.id}</p>
+                    <p class="text-right"><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                    <p><strong>Name:</strong> ${patient.name}</p>
+                    <p class="text-right"><strong>Age/Gender:</strong> ${patient.age} Yrs / ${patient.gender}</p>
+                    <p><strong>Phone:</strong> ${patient.phone}</p>
+                    <p class="text-right"><strong>Address:</strong> ${patient.address}</p>
+                </div>
+
+                <div class="bg-slate-50 p-2 rounded border text-xs mb-4">
+                    <p class="font-bold text-emerald-900">अष्टविध परीक्षा (Ashtavidha Pariksha):</p>
+                    <p>Nadi: ${patient.consultation.nadi} | Jihwa: ${patient.consultation.jihwa} | Mala: ${patient.consultation.mala} | Prakriti: ${patient.consultation.prakriti}</p>
+                </div>
+
+                <div class="space-y-4 text-xs">
+                    <div>
+                        <p class="font-bold">निदान (Diagnosis):</p>
+                        <p class="italic text-slate-700">${patient.consultation.diagnosis}</p>
+                    </div>
+                    <div class="border-t pt-2">
+                        <p class="font-bold text-emerald-950 text-sm mb-1">Rx (औषधि विवरण):</p>
+                        <p class="whitespace-pre-line font-medium">${patient.consultation.prescription}</p>
+                    </div>
+                    <div class="border-t pt-2">
+                        <p class="font-bold">पथ्यापथ्य (Dietary / Lifestyle Advice):</p>
+                        <p class="text-slate-700">${patient.consultation.pathya}</p>
+                    </div>
+                </div>
+
+                <div class="mt-16 pt-4 border-t flex justify-between text-xs font-bold">
+                    <p>Hospital Seal</p>
+                    <p class="border-t border-slate-400 px-6 pt-1">चिकित्सकको दस्तखत (Physician Signature)</p>
+                </div>
+            `;
+
+            window.print();
+        }
+
+        // Billing Logic
+        function populateBillingPatientDropdown() {
+            const select = document.getElementById('bill-patient-select');
+            select.innerHTML = '<option value="">-- Choose Patient --</option>';
+            patients.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.innerText = `${p.name} (${p.id}) - ${p.phone}`;
+                select.appendChild(opt);
+            });
+        }
+
+        function selectForBillingDirect(id) {
+            switchTab('billing');
+            document.getElementById('bill-patient-select').value = id;
+            loadPatientForBilling();
+        }
+
+        function loadPatientForBilling() {
+            const id = document.getElementById('bill-patient-select').value;
+            const patient = patients.find(p => p.id === id);
+            if (!patient) return;
+
+            document.getElementById('billing-patient-badge').innerText = `Billing: ${patient.name}`;
+            
+            // Set default rows
+            currentBillRows = [
+                { desc: 'OPD Ticket & Registration Fee', qty: 1, rate: 50, total: 50 },
+                { desc: 'Ayurvedic Medicine Package', qty: 1, rate: 250, total: 250 }
+            ];
+
+            renderBillTable();
+        }
+
+        function addBillRow() {
+            currentBillRows.push({ desc: 'Ayurvedic Medicine / Therapy', qty: 1, rate: 100, total: 100 });
+            renderBillTable();
+        }
+
+        function removeBillRow(index) {
+            currentBillRows.splice(index, 1);
+            renderBillTable();
+        }
+
+        function updateBillRow(index, field, value) {
+            if(field === 'qty' || field === 'rate') {
+                currentBillRows[index][field] = parseFloat(value) || 0;
+                currentBillRows[index].total = currentBillRows[index].qty * currentBillRows[index].rate;
+            } else {
+                currentBillRows[index][field] = value;
+            }
+            renderBillTable();
+        }
+
+        function renderBillTable() {
+            const tbody = document.getElementById('bill-items-body');
+            tbody.innerHTML = '';
+
+            let subtotal = 0;
+
+            currentBillRows.forEach((row, i) => {
+                subtotal += row.total;
+                const tr = document.createElement('tr');
+                tr.className = "border-b text-xs";
+                tr.innerHTML = `
+                    <td class="p-2"><input type="text" value="${row.desc}" onchange="updateBillRow(${i}, 'desc', this.value)" class="w-full border rounded p-1"></td>
+                    <td class="p-2"><input type="number" value="${row.qty}" onchange="updateBillRow(${i}, 'qty', this.value)" class="w-full border rounded p-1"></td>
+                    <td class="p-2"><input type="number" value="${row.rate}" onchange="updateBillRow(${i}, 'rate', this.value)" class="w-full border rounded p-1"></td>
+                    <td class="p-2 font-bold">रु ${row.total.toFixed(2)}</td>
+                    <td class="p-2 text-center"><button onclick="removeBillRow(${i})" class="text-red-600 font-bold"><i class="fa-solid fa-trash"></i></button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('bill-subtotal').innerText = `रु ${subtotal.toFixed(2)}`;
+            document.getElementById('bill-opd-fee').innerText = `रु 0.00`;
+            document.getElementById('bill-grand-total').innerText = `रु ${subtotal.toFixed(2)}`;
+        }
+
+        // Process Payment and Print Receipt
+        function processAndPrintBill() {
+            const id = document.getElementById('bill-patient-select').value;
+            const patient = patients.find(p => p.id === id);
+
+            if (!patient) {
+                alert('Please select a valid patient to issue a bill.');
+                return;
+            }
+
+            let grandTotal = currentBillRows.reduce((sum, r) => sum + r.total, 0);
+
+            patient.bill = {
+                items: currentBillRows,
+                grandTotal: grandTotal,
+                paid: true,
+                billNo: 'BILL-' + Math.floor(10000 + Math.random() * 90000)
+            };
+
+            saveData();
+            updateStats();
+
+            // Render Printable Receipt
+            const printBox = document.getElementById('print-section');
+            printBox.innerHTML = `
+                <div class="text-center border-b-2 border-slate-800 pb-3 mb-4">
+                    <h4 class="text-xs font-bold text-red-700">गण्डकी प्रदेश सरकार | Gandaki Province Government</h4>
+                    <h5 class="text-[10px] font-semibold">स्वास्थ्य मन्त्रालय | Ministry of Health</h5>
+                    <h2 class="text-2xl font-extrabold text-emerald-950">धौलागिरी आयुर्वेद अस्पताल</h2>
+                    <p class="text-xs font-bold">DHAULAGIRI AYURVEDA HOSPITAL</p>
+                    <p class="text-xs">बागलुङ, नेपाल (Baglung, Nepal) | PAN No: 300123456</p>
+                    <h3 class="text-sm font-bold underline mt-2">OFFICIAL CASH RECEIPT (भुक्तानी रसिद)</h3>
+                </div>
+
+                <div class="grid grid-cols-2 text-xs border-b pb-3 mb-4 space-y-1">
+                    <p><strong>Receipt No:</strong> ${patient.bill.billNo}</p>
+                    <p class="text-right"><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                    <p><strong>Patient ID:</strong> ${patient.id}</p>
+                    <p class="text-right"><strong>Payment Status:</strong> PAID (नगद प्राप्त)</p>
+                    <p><strong>Name:</strong> ${patient.name}</p>
+                    <p class="text-right"><strong>Phone:</strong> ${patient.phone}</p>
+                </div>
+
+                <table class="w-full text-xs text-left border-collapse border border-slate-300 mb-4">
+                    <thead>
+                        <tr class="bg-slate-100 border-b">
+                            <th class="p-2 border">SN</th>
+                            <th class="p-2 border">Particulars / Service Description</th>
+                            <th class="p-2 border text-center">Qty</th>
+                            <th class="p-2 border text-right">Rate (NPR)</th>
+                            <th class="p-2 border text-right">Amount (NPR)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${patient.bill.items.map((item, idx) => `
+                            <tr>
+                                <td class="p-2 border text-center">${idx + 1}</td>
+                                <td class="p-2 border">${item.desc}</td>
+                                <td class="p-2 border text-center">${item.qty}</td>
+                                <td class="p-2 border text-right">${item.rate.toFixed(2)}</td>
+                                <td class="p-2 border text-right">${item.total.toFixed(2)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+
+                <div class="flex justify-end text-xs font-bold mb-12">
+                    <div class="w-64 border-t pt-2 space-y-1 text-right">
+                        <p class="text-sm">Grand Total: रु ${patient.bill.grandTotal.toFixed(2)}</p>
+                        <p class="text-[10px] text-slate-500 font-normal">In Words: Rupees ${patient.bill.grandTotal} Only.</p>
+                    </div>
+                </div>
+
+                <div class="pt-8 border-t flex justify-between text-xs font-bold">
+                    <div>
+                        <p>Hospital Seal</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="border-t border-slate-400 px-6 pt-1">काउन्टर प्रमुख (Cashier Signature)</p>
+                        <p class="text-[10px] text-slate-500 font-normal">Dhaulagiri Ayurveda Hospital</p>
+                    </div>
+                </div>
+            `;
+
+            window.print();
+        }
+
+        // Render History Records
+        function renderRecords(filterText = '') {
+            const tbody = document.getElementById('records-table-body');
+            tbody.innerHTML = '';
+
+            const filtered = patients.filter(p => 
+                p.name.toLowerCase().includes(filterText.toLowerCase()) ||
+                p.id.toLowerCase().includes(filterText.toLowerCase()) ||
+                p.phone.includes(filterText)
+            );
+
+            filtered.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 border-b border-slate-100";
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-xs text-emerald-900">${p.id}</td>
+                    <td class="p-3 font-semibold">${p.name}</td>
+                    <td class="p-3 text-xs">${p.age} / ${p.gender}</td>
+                    <td class="p-3 text-xs">${p.phone}</td>
+                    <td class="p-3"><span class="text-[10px] font-bold px-2 py-0.5 rounded ${p.status === 'Completed' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${p.status}</span></td>
+                    <td class="p-3 font-bold text-xs">रु ${p.bill ? p.bill.grandTotal : 0}</td>
+                    <td class="p-3 text-right space-x-2">
+                        <button onclick="selectForConsultation('${p.id}')" class="text-xs text-emerald-700 font-bold hover:underline">Consult</button>
+                        <button onclick="selectForBillingDirect('${p.id}')" class="text-xs text-blue-700 font-bold hover:underline">Bill</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterRecords() {
+            renderRecords(document.getElementById('search-records').value);
+        }
+
+        function updateStats() {
+            document.getElementById('stat-total').innerText = patients.length;
+            document.getElementById('stat-waiting').innerText = patients.filter(p => p.status === 'Waiting').length;
+            document.getElementById('stat-completed').innerText = patients.filter(p => p.status === 'Completed').length;
+            
+            let totalRevenue = patients.reduce((sum, p) => sum + (p.bill ? p.bill.grandTotal : 0), 0);
+            document.getElementById('stat-revenue').innerText = `रु ${totalRevenue}`;
+        }
+
+        function saveData() {
+            localStorage.setItem('dah_patients', JSON.stringify(patients));
+        }
+    </script>
+</body>
+</html>
